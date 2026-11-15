@@ -11,7 +11,9 @@ export const seedDemoDataForNewUser = async (userId: string) => {
 
   try {
     await db.$transaction((tx) => createDemoData(tx, userId), { timeout: 20_000 });
-  } catch {
-    // Signing in must never fail because the demo data could not be created.
+  } catch (error: unknown) {
+    // Signing in must never fail because the demo data could not be created,
+    // but the reason has to show up in the server logs.
+    process.stderr.write(`Demo data for user ${userId} failed: ${String(error)}\n`);
   }
 };

@@ -2,6 +2,8 @@
 
 A job application tracker. Keep a list of vacancies, move each one through the hiring funnel, see where your applications stand.
 
+**Live demo: <https://offerly-topaz.vercel.app/>**. Sign in with any GitHub account; a new account starts with sample vacancies. Signing in stores your GitHub name, email and avatar in the demo database, and nothing else.
+
 This is a portfolio project built to show how I work with the **Next.js App Router**: Server and Client Components, Server Actions, route handlers, middleware, rendering and caching strategies, a real database, tests and CI. The sections below explain the decisions, not just the features.
 
 ## Features
