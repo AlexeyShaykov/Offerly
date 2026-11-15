@@ -4,6 +4,8 @@ A job application tracker. Keep a list of vacancies, move each one through the h
 
 **Live demo: <https://offerly-topaz.vercel.app/>**. Sign in with any GitHub account; a new account starts with sample vacancies. Signing in stores your GitHub name, email and avatar in the demo database, and nothing else.
 
+![Offerly: the vacancies list with filters and status badges](./screenshot_demo.png)
+
 This is a portfolio project built to show how I work with the **Next.js App Router**: Server and Client Components, Server Actions, route handlers, middleware, rendering and caching strategies, a real database, tests and CI. The sections below explain the decisions, not just the features.
 
 ## Features
@@ -21,6 +23,24 @@ This is a portfolio project built to show how I work with the **Next.js App Rout
 Next.js 15 (App Router) · React 19 · TypeScript (strict) · PostgreSQL 16 · Prisma · Auth.js · Tailwind CSS 4 · Zod · React Hook Form · TanStack Query (only for the optimistic status update) · Vitest + Testing Library · Playwright · GitHub Actions
 
 ## Architecture decisions
+
+The table is the short version: what I chose, why, and what it costs. The subsections below explain the main ones in detail.
+
+| Decision                                                         | Why                                                                            | Trade-off                                                                      |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
+| Feature-Sliced layers with ESLint-enforced boundaries            | One direction of dependencies, easy to find things, no import cycles           | More folders than a small app strictly needs                                   |
+| Two entry points per slice (`index.ts` and `server.ts`)          | Keeps Prisma out of the browser bundle by construction                         | A deliberate exception to "export only through `index.ts`"                     |
+| JWT sessions plus the Prisma adapter                             | Middleware runs on the edge and can verify the session without a database call | The `Session` table stays empty and sessions cannot be revoked server-side     |
+| One Zod schema for the form, the Server Action and the REST body | Validation rules live in exactly one place                                     | REST needs a thin adapter, because JSON clients send numbers and `null`        |
+| Status change as one transaction with a conditional update       | History can never contradict the vacancy, and concurrent changes are safe      | Slightly more code than a plain `update`                                       |
+| Transition rules injected into the database layer                | `entities` never imports from `features`                                       | An extra function parameter                                                    |
+| `unstable_cache` per user instead of page-level ISR              | The page reads the session, so it is dynamic and `revalidate` would do nothing | Data is cached, not HTML; tag-based invalidation to maintain                   |
+| TanStack Query only for the optimistic status control            | Everything else is loaded in Server Components, no client cache needed         | Two ways of holding state in one app, kept to a single feature                 |
+| Company as free text with find-or-create                         | Simple form, no extra screens                                                  | No unique constraint on `(userId, name)`, so a race can create a duplicate     |
+| Offset pagination (`skip`/`take`)                                | Simple, indexes cover it, fine for hundreds of rows                            | Would not scale to very large lists; cursors would                             |
+| Test-only Credentials provider for E2E                           | GitHub OAuth cannot run in automated tests                                     | Guarded by an env flag **and** `NODE_ENV`, never present in a production build |
+| Direct (non-pooled) Neon connection                              | Works with `prisma migrate deploy` without a `directUrl`                       | No connection pooling for serverless at higher load                            |
+| Salary as a whole number of rubles                               | Enough for filtering and display                                               | No currencies                                                                  |
 
 ### Feature-Sliced Design adapted to the App Router
 
