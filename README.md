@@ -12,6 +12,7 @@ This is a portfolio project built to show how I work with the **Next.js App Rout
 - Change a vacancy status with an optimistic update; every change is recorded in a history
 - Statistics page: application funnel with conversion and applications per week
 - `POST /api/vacancies` REST endpoint for external clients
+- Optional demo data: a new account can be filled with sample vacancies on its first sign-in (`DEMO_DATA_ON_SIGNUP=true`), so a visitor never lands on an empty app
 
 ## Stack
 
@@ -87,7 +88,7 @@ pnpm dev                 # http://localhost:3000
 
 1. Generate `AUTH_SECRET`: `openssl rand -base64 32`.
 2. Create a GitHub OAuth App (GitHub → Settings → Developer settings → OAuth Apps). Homepage URL `http://localhost:3000`, callback URL `http://localhost:3000/api/auth/callback/github`. Put the client ID and secret into `AUTH_GITHUB_ID` and `AUTH_GITHUB_SECRET`.
-3. Sign in once, then set `SEED_USER_EMAIL` to your email and run `pnpm db:seed` to get demo vacancies on your own account. Note that this replaces that user's vacancies and companies.
+3. Either set `DEMO_DATA_ON_SIGNUP=true` before your first sign-in, or sign in once, then set `SEED_USER_EMAIL` to your email and run `pnpm db:seed` to get demo vacancies on your own account. Note that this replaces that user's vacancies and companies.
 
 ### Commands
 
@@ -109,6 +110,7 @@ CI (GitHub Actions) runs lint, typecheck, unit tests and build in one job, and t
    - `DATABASE_URL`: the Neon string from step 1
    - `AUTH_SECRET`: a new random value, different from local
    - `AUTH_GITHUB_ID`, `AUTH_GITHUB_SECRET`: from the production OAuth App
+   - `DEMO_DATA_ON_SIGNUP=true` (optional): fill every new account with demo data on its first sign-in
 4. In the Vercel project settings (Functions → Region) set the function region to the one next to your Neon database, for example Frankfurt (`fra1`) with Neon `eu-central-1`. The default is Washington (`iad1`), and a database on another continent adds a noticeable delay to every page.
 5. Deploy. Migrations (`prisma migrate deploy`) run automatically, **only for the Production environment**, so preview deployments never change the database schema.
 

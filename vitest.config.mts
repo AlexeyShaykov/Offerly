@@ -6,7 +6,11 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      // `server-only` throws outside the React server condition; tests run in plain node.
+      'server-only': fileURLToPath(new URL('./vitest.empty.ts', import.meta.url)),
+    },
   },
   test: {
     // Unit tests run in node; component tests opt in with `// @vitest-environment jsdom`.
