@@ -5,3 +5,5 @@ src/generated
 CLAUDE.md
 .next-e2e
 e2e/.auth
+.playwright-mcp
+.claude

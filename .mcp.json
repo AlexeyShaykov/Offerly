@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@0.0.85",
+        "--isolated",
+        "--storage-state",
+        "e2e/.auth/user.json",
+        "--allowed-origins",
+        "http://localhost:3200",
+        "--output-dir",
+        "/tmp/offerly-playwright-mcp"
+      ],
+      "env": {}
+    }
+  }
+}
